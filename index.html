@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Life</title>
+</head >
+<body id="screen">
+    <nav>
+        <ul class="navi" style="list-style-type:none;">
+            <li>
+                <a>CONSIZE</a>
+            </li>
+            <li>
+                <a id="contact">GitHub</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="fields">
+        
+        <textarea name="inppp"  placeholder="Paste Your Original Text Here..." rows="1000000" cols="600" id="original" class="inp"></textarea>
+           
+        
+        <button id="zipButton" onclick="readOrg()">Z I P</button>
+        
+            <textarea readonly id="outputtt"   placeholder="Your Zipped file will appear here!" class="inp" rows="1000000" cols="600"></textarea>
+            
+        
+    </div>
+    <div class="size">
+        <h2 id="orgSize" ></h2>
+        <h2 id="finalSize" ></h2>
+    </div>
+    <div>
+        <textarea readonly id="codes" rows=6 cols=1000></textarea>
+    </div>
+    
+  <script>
+    // Your JavaScript goes here!
+    //console.log(~~(5/2));
+    var s=""
+    function readOrg()
+    {   
+        document.getElementById('zipButton').style['background']='grey';
+        s=document.getElementById('original').value;
+        console.log(s);
+        var fmap={};
+        for(i=0;i<s.length;i++)
+        {
+            console.log(i);
+            if(s[i] in fmap)
+                fmap[s[i]]++;
+            else fmap[s[i]]=1;
+        }
+        for(i=0;i<s.length;i++)
+        {
+            console.log(s[i]+":"+fmap[s[i]]);
+        }
+        var keys=[];
+        for (const key in fmap) 
+        {
+            console.log('The value for ' + key + ' is = ' + fmap[key]);
+            keys.push(key);
+        }
+        console.log(keys);
+        class Node{
+            constructor(data,freq,left=null,right=null)
+            {
+                
+                console.log(this.data+"-left->"+this.left+", right->"+this.right);
+                this.data=data;
+                this.freq=freq;
+                this.left=left;
+                this.right=right;
+            }
+        }
+        class tree{
+            constructor(){
+                this.root=null;
+            }
+        }
+        function insertTree(freq,data,l,r)
+        {
+            var node=new Node(data,freq,l,r)
+            var current;
+            return node;
+        }
+       // var tree=new Array((keys.length*(keys.length+1))/2);
+        var minHeap=new Array();
+        
+        //var treeIndex=(keys.length*(keys.length+1))/2;
+        var minSize=0;
+   // tree.fill(null);
+        console.log(tree);
+        function swap(a,b)
+        {
+            var temp=minHeap[a];
+            minHeap[a]=minHeap[b];
+            minHeap[b]=temp;
+        }
+
+        function insert(data,freq,siz)
+        {
+            var temp=new Array(freq,data);
+            //minHeap.push(temp);
+            minHeap.push(temp);
+           // console.log("what the f")
+           console.table(minHeap);
+            console.log("what the fuck="+minHeap[siz][0]);
+            siz++;
+        }
+        function heapify(i)
+        {
+            if(i==0)
+                return;
+            console.log("inside heapify"+i+","+~~(i/2)+" = " +minHeap[i][0]+", "+minHeap[~~(i/2)][0]);
+            if(minHeap[i][0] < minHeap[~~(i/2)][0])
+            {
+                swap(i,~~(i/2));
+                console.log("swappp "+"inside heapify"+i+","+~~(i/2)+" = " +minHeap[i][0]+", "+minHeap[~~(i/2)][0]);
+                heapify(~~(i/2));
+            }
+        }
+        function del(arr,siz)
+        {
+            swap(0,siz-1);
+            siz--;
+
+        }
+        function delheapify(arr)
+        {
+            var i=0;
+            while(2*i+1<minSize)
+            {   
+                if( arr[2*i][0]<arr[i][0] && arr[2*i][0]<arr[2*i+1][0] )
+                {
+                    swap(i,2*i);
+                    i=2*i;
+                }
+                else if(arr[2*i+1][0]<arr[i][0] && arr[2*i][0]>arr[2*i+1][0])
+                {
+                    swap(i,2*i+1);
+                    i=2*i+1;
+                }
+                else{
+                    break;
+                }
+            }
+        }
+        var nodeMap={};
+        for(i=0;i<keys.length;i++)
+        {
+            insert(keys[i],fmap[keys[i]],minSize);
+            minSize++;
+            console.log("y");
+            console.log(minHeap[minSize-1]);
+            heapify(minSize-1);
+            console.log("heapifykrdia");
+            console.table(minHeap);
+
+            console.log("es");
+            nodeMap[keys[i]]=insertTree(fmap[keys[i]],keys[i],null,null);
+            //node=insertTree(first[0]+second[0],first[1]+second[1],nodeMap[first[1]],nodeMap[second[1]]);
+            
+        }
+        var node= new Node();
+        while(minSize>1)
+        {
+            
+            var first=minHeap[0];
+            console.log(first);
+            del(minHeap,minSize);
+            minSize--;
+            delheapify(minHeap,minSize);
+            minHeap.pop();
+            var second=minHeap[0];
+            console.log("min2="+minHeap[0]);
+            del(minHeap,minSize);
+            minSize--;
+            delheapify(minHeap,minSize);
+            minHeap.pop();
+            console.log("minimum++ = "+ first[1]+second[1]);
+            insert(first[1]+second[1],first[0]+second[0],minSize);
+            minSize++;
+            heapify(minSize-1);
+            console.table(minHeap);
+            node=insertTree(first[0]+second[0],first[1]+second[1],nodeMap[first[1]],nodeMap[second[1]]);
+            nodeMap[node.data]=node;
+        }
+        console.log(node.data);
+        console.log("Now it's time to print tree");
+        var code='';
+        var codeMap={};
+        function printTree(node,code)
+        {
+            console.log("hello");
+            if(node.left==null && node.right==null)
+            {
+                codeMap[node.data]=code;
+                return;
+            }
+            else{
+                console.log(node.data);
+                if(node.left!=null)
+                    printTree(node.left,code+'0');
+                if(node.right!=null)
+                    printTree(node.right,code+'1');
+            }
+        }
+        printTree(node,'');
+        console.log(codeMap);
+        var output=''
+        for(i=0;i<s.length;i++)
+        {
+            output+=codeMap[s[i]];
+        }
+        console.log(output);
+        document.getElementById("outputtt").innerHTML = output;
+        document.getElementById("orgSize").innerHTML = "Original Size: "+s.length*7+" bits";
+        var osize=0;
+        for(i=0;i<keys.length;i++)
+        {
+            osize+=fmap[keys[i]]*codeMap[keys[i]].length;
+        }
+        document.getElementById("finalSize").innerHTML = "Compressed Size: "+osize+" bits";
+        codestr=''
+        for(i=0;i<keys.length;i++)
+        {
+            codestr+=keys[i]+" : "+codeMap[keys[i]]+'\n';
+        }
+        document.getElementById('codes').innerHTML=codestr;
+    }
+    
+    
+   
+
+
+  </script>
+  <style>
+      #screen{
+          display: flex;
+          flex-direction: column;
+          background-color: black;
+          font-family:'Courier New', Courier, monospace
+          
+      }
+        .fields{
+           
+            display:flex;
+            height:300px;
+            justify-content:center;
+            Margin:30px;
+        } 
+      
+      .navi{
+        display:flex;
+        flex-direction: row;
+        justify-content: space-between;
+        color:#5DCAC4 ;
+        height:27px;
+        font-size: 22px;
+        font-weight: 1000;
+        padding: 0px;
+        margin-top: -8px;
+        margin-left:-8px;
+        margin-right:-8px;
+        padding-left:12px;
+        padding-right: 12px;
+        margin-bottom: 50;
+        background-color:rgb(36, 36, 36);
+        border:none;
+        }
+        
+        .inp{
+            background:rgb(36, 36, 36) ;
+            border:none;
+            border-radius: 5px;
+            color:#5DCAC4 ;
+            margin:30px;
+            font-size: 18px;
+            height: 300px;
+        }
+        #contact:hover{
+            color:#00fff2;
+        }
+        #zipButton{
+            width: 1500px;
+            height:30px;
+            margin-top: 165px;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            background: #5DCAC4;
+            border-radius: 5px;
+            border-width: 0.2px; 
+            font-weight: 600;           
+
+        }
+        #zipButton:hover{
+            color:white;
+            background: #19f7eb;
+        }
+        .inp:hover{
+
+            background: rgb(31, 31, 31);
+        }
+        .size{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            font-size: 10px;
+        }
+        #orgSize{
+            color:orange;
+
+        }
+        #finalSize{
+            color:palegreen;
+        }
+        #codes{
+            background:rgb(36, 36, 36) ;
+            border:none;
+            border-radius: 5px;
+            width:370px;
+            color:#5DCAC4 ;
+            margin:30px;
+            height: 70px;
+            margin-left:600px;
+          
+        }
+        
+  </style>
+</body>
+    
+</html>
